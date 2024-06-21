@@ -1,0 +1,7 @@
+services:
+  - name: node-app
+    env:
+      - key: NODE_ENV
+        value: production
+    buildCommand: npm install --production
+    startCommand: npm start
