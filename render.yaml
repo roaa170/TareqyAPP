@@ -1,6 +1,7 @@
 services:
   - name: node-app
-    env:
+    rootDir: tareqy
+    envVars:
       - key: NODE_ENV
         value: production
     buildCommand: npm install --production
