@@ -1,7 +1,8 @@
 {
   "scripts": {
     "dev": "nodemon Services/*.js",
-    "start": "node index.js"
+    "start": "node index.js",
+     "build": "npm install --production"
 
     
   },
