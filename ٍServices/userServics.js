@@ -20,8 +20,7 @@ exports.userImage = uploadImage('profileImg')
 exports.getUsers =expressAsyncHandler( 
     async(req, res) => {
     const users = await User.find({})
-   
-    res.status(200).json({results:users.length , data:users})
+     res.status(200).json({results:users.length , data:users})
 })
 //@desc create user
 //access private
@@ -34,8 +33,6 @@ exports.getUser = expressAsyncHandler(async(req,res,next)=>{
     } res.status(200).json({data:user})
 
 
-  
-
 })
 //@desc create user
 //access private
@@ -47,31 +44,55 @@ async(req, res) => {
        req.body
         )
     res.status(201).json({ data: user })
-    //.then(user  )
-    //.catch(err=>res.status(400).send(err))    
-    //  const newUser = new User({ name })
-    // newUser.save().then(doc => res.json(doc)).catch(err => res.json(err))
+  
 })
 //@desc update specific user --update name
 //route Put /api/user/:id
 //access public
-exports.updateUser = expressAsyncHandler(async(req,res,next)=>{
-    //** const {id} = req.params
-    // console.log(id)
-    // res.json({data:id})
-   //** const newName =req.body.name
+/*exports.updateUser = expressAsyncHandler(async(req,res,next)=>{
+  
    console.log(req.body)
     const user= await User.findByIdAndUpdate(
-       //** */ {_id:id}, {name:newName ,slugs: slugify(newName) } ,{new:true}
+      
       req.params.id , req.body ,{new:true}
     )
     if(!user){
-       //**  */ res.status(404).json({msg:`no user for this id `})
+       
         return next(new ApiError (`no user for this id `,404))
 
     }
      res.status(200).json({data:user})
-})
+})*/
+
+exports.updateUser = expressAsyncHandler(async (req, res, next) => {
+  console.log(req.body);
+
+  // تحقق من وجود المستخدم قبل محاولة التحديث
+  const user = await User.findById(req.params.id);
+  if (!user) {
+      return next(new ApiError('No user found for this ID', 404));
+  }
+
+  // إذا كانت كلمة المرور موجودة في الطلب وتم تعديلها، قم بتشفيرها
+  if (req.body.password) {
+      const salt = await bcrypt.genSalt(12);
+      req.body.password = await bcrypt.hash(req.body.password, salt);
+  }
+
+  // تحديث المستخدم مع الخيارات الصحيحة
+  const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true, context: 'query' }
+  );
+
+  if (!updatedUser) {
+      return next(new ApiError('Error updating user', 500));
+  }
+
+  res.status(200).json({ data: updatedUser });
+});
+
 exports.changeUserPassword = expressAsyncHandler(async (req, res, next) => {
     const document = await User.findByIdAndUpdate(
       req.params.id,

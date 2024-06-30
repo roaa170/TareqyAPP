@@ -168,30 +168,30 @@ const createToken = require("../utils/createToken");
 
 exports.signup = asyncHandler(async (req, res, next) => {
   try {
-    // جلب البيانات من API
+    // Fetch data from API
     const response = await axios.get('https://tareqyapi-10.onrender.com/api/driver?populate=*');
     const driverData = response.data;
 
-    // NID الذي أدخله المستخدم
+    // NID entered by the user
     const userNID = req.body.NID;
 
-    // التحقق من وجود NID المدخل ضمن العناصر المسترجعة
+    // Verify that the NID entered is present among the retrieved items
     const matchedItem = driverData.data.find(item => item.attributes.NID === userNID);
 
     if (matchedItem) {
-      // جلب جميع المعلومات المتعلقة بالعنصر الذي تطابق NID الخاص به
+      // Fetches all information related to the item whose NID matches
       const { name, phone, NID, vehicles } = matchedItem.attributes;
 
       
 
-      // توليد كود تحقق وتجزئته
+      // Generate verification code and hash it
       const verifiedCode = Math.floor(100000 + Math.random() * 900000).toString();
       const hashedVerifiedCode = crypto
         .createHash("sha256")
         .update(verifiedCode)
         .digest("hex");
 
-      // إنشاء مستخدم جديد وتخزينه في قاعدة البيانات
+      // Create a new user and store it in the database
       const user = await User.create({
         userName:req.body.userName,
         name,
@@ -205,11 +205,12 @@ exports.signup = asyncHandler(async (req, res, next) => {
         vehicles 
       });
 
-      // إنشاء توكن
+      // Create a token
       const token = createToken(user._id);
 
-      // إرسال رمز التحقق عبر الرسائل النصية
-      const message = `Hi ${user.name},\n We received a request to verify your account on your Tareqy Account. \n ${verifiedCode} \n Enter this code to complete the reset. \n Thanks for helping us keep your account secure.\n The Tareqy Team`;
+      // Send verification code via text message
+      const message = `Hi ${user.name},\n We received a request to verify your account on your Tareqy Account.
+       \n ${verifiedCode} \n Enter this code to complete the reset. \n Thanks for helping us keep your account secure.\n The Tareqy Team`;
 
       const to = phone;
 
@@ -217,7 +218,7 @@ exports.signup = asyncHandler(async (req, res, next) => {
         await sendSMS(message, to);
         console.log('SMS sent successfully to:', to);
       } catch (err) {
-        // في حالة فشل إرسال رمز التحقق عبر SMS، نقوم بإعادة تعيين الحقول ذات الصلة
+        // If the SMS verification code fails to send, we reset the relevant fields
         user.verifiedCode = undefined;
         user.verifiedCodeExpires = undefined;
         user.verifiedCodeVerified = undefined;
@@ -241,14 +242,6 @@ exports.signup = asyncHandler(async (req, res, next) => {
     });
   }
 });
-
-
-
-
-
-
-
-
 
 
 

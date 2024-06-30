@@ -19,22 +19,6 @@ const sendEmail = async (options) => {
       });
 
 
-    ///////////////////////////////////
-
-
-      /*const transporter = nodemailer.createTransport({
-        // service:"gmail",
-        host: "smtp.gmail.com",//"roaa.amin1701@gmail.com",
-        port: 465,//2525,
-        auth: {
-          user: "roaa.amin1701@gmail.com",
-          pass: "Roaaamin2002"
-        }
-      });*/
-
-
-
-
   // 2) Define email options (like from, to, subject, email content)
   const mailOpts = {
     from: 'Tareqy <tareqy816@gmail.com>',
@@ -43,8 +27,7 @@ const sendEmail = async (options) => {
     subject: options.subject,
     text: options.message,
   };
-
-  // 3) Send email
+// 3) Send email
   console.log("zakyyyyyyyyyyyy")
 
   await transporter.sendMail(mailOpts);

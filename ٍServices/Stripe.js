@@ -35,27 +35,6 @@ exports.stripe = async (req, res) => {
         res.json({ "error": error });
     }
 }
-/*exports.stripe = async (req, res) => {
-     // ) Create stripe checkout session
-     const session = await stripe.checkout.sessions.create({
-        line_items: [
-          {
-            name: req.user.name,
-            amount: req.body.totalOrderPrice * 100,
-            currency: 'egp',
-            quantity: 1,
-          },
-        ],
-        mode: 'payment',
-        success_url: `${req.protocol}://${req.get('host')}/`,
-        cancel_url: `${req.protocol}://${req.get('host')}/cancel`,
-        customer_email: req.user.email,
-      });
-    
-      // 4) send session to response
-      res.status(200).json({ status: 'success', session });
  
-  
-} */
 console.log("Doneee");
 
