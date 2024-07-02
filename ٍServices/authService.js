@@ -15,64 +15,7 @@ const createToken = require("../utils/createToken");
 //route  POST/api/auth/signup
 //access public
 
-/*exports.signup = asyncHandler(async (req, res, next) => {
 
-  const response = await axios.get('http://localhost:1337/api/driver');
-  const driverData = response.data;
-
-  // التكرار عبر جميع العناصر في مصفوفة data
-  driverData.data.forEach((item, index) => {
-    const NID = item.attributes.NID;
-    console.log(`NID of item ${index + 1}:`, NID);
-  });
-
-
-
-
-  // 2)  Generate hash reset random 6 digits and save it in db
-  const verifiedCode = Math.floor(100000 + Math.random() * 900000).toString();
-  const hashedVerifiedCode = crypto
-    .createHash("sha256")
-    .update(verifiedCode)
-    .digest("hex");
- //create user
- const user = await User.create({
-   name: req.body.name,
-   NID: req.body.NID,
-   email: req.body.email,
-   password: req.body.password,
-   verifiedCode : hashedVerifiedCode,
-   verifiedCodeExpires : Date.now() + 10 * 60 * 1000,
-   verifiedCodeVerified :false,
-   phoneNumber: req.body.phoneNumber,
-  
- 
- });
- // create token
- const token = createToken(user._id);
- 
- // 3) Send the reset code via sms
-
- const message = `Hi ${user.name},\n We received a request to verify your account on your Tareqy Account. \n ${verifiedCode} \n Enter this code to complete the reset. \n Thanks for helping us keep your account secure.\n The Tareqy Team`;
- 
- const to = req.body.phoneNumber;
-
- try {
-    await sendSMS(message, to);
-     console.log("doneee sms");
-   console.log(to);
- } catch (err) {
-   user.verifiedCode = undefined;
-   user.verifiedCodeExpires = undefined;
-   user.verifiedCodeVerified = undefined;
-
-   await user.save();
-   return next(new ApiError("There is an error in sending sms", 500));
- }
-
- res.status(201).json({ data: user, token });
- //res.status(201).json({ data: user, token })
-});*/
 
 
 
@@ -180,7 +123,7 @@ exports.signup = asyncHandler(async (req, res, next) => {
 
     if (matchedItem) {
       // Fetches all information related to the item whose NID matches
-      const { name, phone, NID, vehicles } = matchedItem.attributes;
+      const { name, phone, NID, vehicles , photo } = matchedItem.attributes;
 
       
 
@@ -195,6 +138,7 @@ exports.signup = asyncHandler(async (req, res, next) => {
       const user = await User.create({
         userName:req.body.userName,
         name,
+        profileImg: photo,
         NID,
         email: req.body.email,
         password: req.body.password,
@@ -212,7 +156,7 @@ exports.signup = asyncHandler(async (req, res, next) => {
       const message = `Hi ${user.name},\n We received a request to verify your account on your Tareqy Account.
        \n ${verifiedCode} \n Enter this code to complete the reset. \n Thanks for helping us keep your account secure.\n The Tareqy Team`;
 
-      const to = phone;
+      const to = req.phone;
 
       try {
         await sendSMS(message, to);
